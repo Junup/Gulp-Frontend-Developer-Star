@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<link rel="stylesheet" href="https://cdn.datatables.net/1.10.13/css/jquery.dataTables.min.css" >
+	<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.2.4/css/buttons.dataTables.min.css">
+
+</head>
+<body>
+	<table id="example">
+	</table>
+	<button id="btn">asdasd</button>
+	<script src="jquery.min.js"></script>
+	<script src="jquery.dataTables.min.js"></script>
+	<script src="https://cdn.datatables.net/buttons/1.2.4/js/dataTables.buttons.min.js"></script>
+	<script src="jquery.table2excel.js"></script>
+	<script>
+
+		$.ajaxSetup({
+			url: 'https://api.symdqsw.com/admin/goods/all.action',
+			success: function (data){
+				console.log(data)
+			}
+		})
+		
+		$.ajaxPrefilter(function( options, originalOptions, jqXHR ) {
+		  if ( options.abortOnRetry ) {
+		    if ( currentRequests[ options.url ] ) {
+		      currentRequests[ options.url ].abort();
+		    }
+		    currentRequests[ options.url ] = jqXHR;
+		  }
+		});
+ 
+        var table = $('#example').DataTable( {
+	        ajax: {
+				url: 'https://api.symdqsw.com/admin/goods/all.action',
+	        	dataType : 'json',
+	        	dataSrc : function(data){
+	        		return data.data.goods;
+	        	}
+	        }, 
+	        columns: [
+	            {  
+	                "mDataProp" : "commission",  
+	                "sTitle" : "测试1",  
+	            }, {  
+	                "mDataProp" : "categoryName",  
+	                "sTitle" : "测试2",  
+	            }, {  
+	                "mDataProp" : "name",  
+	                "sTitle" : "测试3",  
+	            }, {  
+	                "mDataProp" : "mtkMoney",  
+	                "sTitle" : "测试4",  
+	            }, {  
+	                "mDataProp" : "statusName",  
+	                "sTitle" : "测试5",  
+	            }, {
+		            "mDataProp": "status",
+		            "sTitle" : "状态",  
+		             "render": function (data, type, full, callback) {
+		             	//console.log(data,type,full,callback)
+		             	if (data == 1) {
+		                	return ('<a class="btn btn-info">禁用</a> <a class="btn btn-info">删除</a>');
+		             	}else{
+		                	return ('<a class="btn btn-info">删除</a>');
+		             	}
+		            }
+		        }
+	        ],
+	        language: {
+	            "lengthMenu": "每页 _MENU_ 条记录",
+	            "zeroRecords": " ",
+	            "info": "当前 _START_ 条到 _END_ 条 共 _TOTAL_ 条",
+	            "infoEmpty": "无记录",
+	            "infoFiltered": "(从 _MAX_ 条记录过滤)",
+	            "search": "用户",
+	            "processing": "载入中",
+	            "paginate": {
+	                "first": "首页",
+	                "previous": "上一页",
+	                "next": "下一页",
+	                "last": "尾页"
+	            }
+	        }
+	    });
+	    $("#btn").click(function(){
+	        $("#example").table2excel({
+	            name: "Excel Document Name",
+	            filename: "demo.xlsx",
+	            exclude_img: true,
+	            exclude_links: true,
+	            exclude_inputs: true
+	        });
+    	});
+	</script>
+
+	<script>
+		/*{
+            "data": "status",
+            "render": function (data, type, full, callback) {
+                //类型：0导航菜单；1操作按钮。
+                switch (data) {
+                    case 0: return "导航菜单"; break;
+                    case 1: return "操作按钮 "; break;
+                }
+            }
+        },
+        {
+            "data": "status",//json
+            "render": function (data, type, full, callback) {
+                return ('<a class="btn btn-info"    data-toggle="modal" data-target="#modal-addOrUpdate" onclick="details(\'' + data + '\');" >禁用</a><a class="btn btn-info"    data-toggle="modal" data-target="#modal-addOrUpdate" onclick="details(\'' + data + '\');" >删除</a>');
+            }
+        }*/
+	</script>
+</body>
+</html>
